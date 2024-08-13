@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:refulgenceinc/constants/constants.dart';
 import 'package:refulgenceinc/controller/home_controller.dart';
 import 'package:refulgenceinc/model/model.dart';
+import 'package:refulgenceinc/view/details_page.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,14 +16,13 @@ class _HomeScreenState extends State<HomeScreen> {
 @override
   void initState() {
     super.initState();
-    // Fetch initial data when the screen is loaded
     Future.microtask(() => Provider.of<HomeController>(context, listen: false).getAllDatas());
   }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    String? baseUrl = 'https://kumudam.com/';
+    
     return Scaffold(
       appBar: AppBar(
         title: Text('KUMUDHAM NEWS', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -31,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (provider.datas.isEmpty && provider.isLoading) {
             return Center(child: CircularProgressIndicator());
           } else if (provider.datas.isEmpty) {
-            return Center(child: Text('Data is Not Available'));
+            return Center(child: CircularProgressIndicator());
           } else {
             return RefreshIndicator(
               onRefresh: provider.refresh,
@@ -58,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     }
 
                     DataModel data = provider.datas[index];
-                    String imageUrl = data.imageBig != null ? '$baseUrl${data.imageBig}' : '';
+                    String imageUrl = data.imageBig != null ? '${Url.imageBaseUrl}${data.imageBig}' : '';
 
                     return Card(
                       key: ValueKey(data.id),
@@ -67,22 +68,27 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Column(
                           children: [
                             InkWell(
-                              child: Container(
-                                height: size.height * 0.2,
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
-                                  image: imageUrl.isNotEmpty
-                                      ? DecorationImage(
-                                          image: NetworkImage(imageUrl),
-                                          //image: AssetImage("assets/news.jpg"),
-                                          fit: BoxFit.cover,
-                                        )
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.push(context, MaterialPageRoute(builder:(context)=> DetailsPage(data: data,)));
+                                },
+                                child: Container(
+                                  height: size.height * 0.2,
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    image: imageUrl.isNotEmpty
+                                        ? DecorationImage(
+                                            image: NetworkImage(imageUrl),
+                                            //image: AssetImage("assets/news.jpg"),
+                                            fit: BoxFit.cover,
+                                          )
+                                        : null,
+                                  ),
+                                  child: imageUrl.isEmpty
+                                      ? Center(child: Text('No image available'))
                                       : null,
                                 ),
-                                child: imageUrl.isEmpty
-                                    ? Center(child: Text('No image available'))
-                                    : null,
                               ),
                             ),
                             Padding(

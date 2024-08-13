@@ -1,12 +1,13 @@
 import 'dart:developer';
 import 'package:dio/dio.dart';
+import 'package:refulgenceinc/constants/constants.dart';
 import 'package:refulgenceinc/model/model.dart';
 
 class ApiService {
   final Dio dio = Dio();
 
   Future<List<DataModel>> getDatas(int offset) async {
-    final String url = "https://news.kumudam.com/api/posts/?limit=20&offset=$offset&order=id&orderType=desc";
+    final String url = "${Url.baseUrl}$offset${Url.endUrl}";
     log('Service${offset}value');
 
     try {
